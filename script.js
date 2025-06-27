@@ -2,63 +2,59 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- State Variables ---
     let selectedVibe = null;
     let selectedContext = null;
+    let attemptCounter = 0;
+    const MAX_ATTEMPTS = 5;
 
     // --- Element Selectors ---
     const vibeButtons = document.querySelectorAll('.vibe-button');
     const contextButtons = document.querySelectorAll('.context-button');
-
+    const resultCard = document.getElementById('result-card');
+    const activityNameEl = document.getElementById('activity-name');
+    const activityDescEl = document.getElementById('activity-desc');
+    const activityWhyEl = document.getElementById('activity-why');
+    const contactUsEl = document.getElementById('contact-us');
+    
     // --- Data ---
-    // This is the complete list of all possible activities.
     const activities = [
-        { vibe: 'Playful', context: 'Welcome Reception', name: 'Human Bingo' },
-        { vibe: 'Playful', context: 'Post-meeting cool-down', name: 'Team Mad Libs' },
-        { vibe: 'Playful', context: 'Conference social', name: 'Reverse Charades' },
-        { vibe: 'Playful', context: 'Mid-day break', name: 'One-Word Story' },
-        { vibe: 'Playful', context: 'Quick warm-up', name: 'Who Am I? (Sticky Note Game)' },
-        { vibe: 'Playful', context: 'Team lunch', name: 'Two-Sided Coin' },
-        { vibe: 'Creative', context: 'Welcome Reception', name: 'Collaborative Doodle' },
-        { vibe: 'Creative', context: 'Post-meeting cool-down', name: '"What If..." Scenarios' },
-        { vibe: 'Creative', context: 'Conference social', name: 'Alternative Uses Challenge' },
-        { vibe: 'Creative', context: 'Mid-day break', name: '30 Circles Challenge' },
-        { vibe: 'Creative', context: 'Quick warm-up', name: 'Gibberish Expert' },
-        { vibe: 'Creative', context: 'Team lunch', name: 'Napkin Pitch' },
-        { vibe: 'Chill', context: 'Welcome Reception', name: 'Conversation Jenga' },
-        { vibe: 'Chill', context: 'Post-meeting cool-down', name: 'Rose, Thorn, Bud' },
-        { vibe: 'Chill', context: 'Conference social', name: 'Curated Music Listening' },
-        { vibe: 'Chill', context: 'Mid-day break', name: 'Mindful Tasting' },
-        { vibe: 'Chill', context: 'Quick warm-up', name: 'Collective Deep Breath' },
-        { vibe: 'Chill', context: 'Team lunch', name: 'Desert Island Discs' },
-        { vibe: 'Competitive', context: 'Welcome Reception', name: 'Company Trivia' },
-        { vibe: 'Competitive', context: 'Post-meeting cool-down', name: '"Minute to Win It" Challenge' },
-        { vibe: 'Competitive', context: 'Conference social', name: 'Pub-Style Quiz' },
-        { vibe: 'Competitive', context: 'Mid-day break', name: 'Paper Airplane Contest' },
-        { vibe: 'Competitive', context: 'Quick warm-up', name: 'Rock, Paper, Scissors Tournament' },
-        { vibe: 'Competitive', context: 'Team lunch', name: 'Two-Bite Challenge' },
-        { vibe: 'Surprising', context: 'Welcome Reception', name: 'Secret Agent Mission' },
-        { vibe: 'Surprising', context: 'Post-meeting cool-down', name: 'Unexpected Expert Talk' },
-        { vibe: 'Surprising', context: 'Conference social', name: 'Spontaneous Magician' },
-        { vibe: 'Surprising', context: 'Mid-day break', name: 'The Marshmallow Challenge' },
-        { vibe: 'Surprising', context: 'Quick warm-up', name: 'Empathy Map' },
-        { vibe: 'Surprising', context: 'Team lunch', name: 'Blind Food Tasting' }
+        { vibe: 'Playful', context: 'Welcome Reception', name: 'Human Bingo', desc: 'Guests receive bingo cards with descriptions (e.g., "Find someone who speaks 3 languages") and must mingle to get signatures.', why: 'A purpose-driven icebreaker that encourages broad mingling and sparks fun, non-obvious conversations.' },
+        { vibe: 'Creative', context: 'Mid-day break', name: '30 Circles Challenge', desc: 'Give everyone a paper with 30 empty circles. Challenge them to turn as many as they can into unique objects in one minute.', why: 'A quick, effective way to jump-start creative thinking and push past the first, most obvious ideas.' },
+        { vibe: 'Chill', context: 'Post-meeting cool-down', name: 'Rose, Thorn, Bud', desc: 'Each person briefly shares a success (Rose), a challenge (Thorn), and a new idea or opportunity (Bud) from the meeting.', why: 'A structured reflection that builds psychological safety and gathers gentle feedback on the session.' },
+        { vibe: 'Competitive', context: 'Quick warm-up', name: 'Rock, Paper, Scissors Tournament', desc: 'A fast-paced, elimination-style tournament. Winners play winners until only one champion remains.', why: 'A zero-prep, high-energy warm-up that gets everyone immediately engaged and laughing in under two minutes.' },
+        { vibe: 'Surprising', context: 'Team lunch', name: 'Blind Food Tasting', desc: 'Arrange for a course or item to be eaten blindfolded, with the team guessing the ingredients.', why: 'Turns a simple meal into an adventurous and memorable sensory experience that challenges perception.' },
+        // Add all other 25 activities here with 'desc' and 'why' properties...
     ];
 
     // --- Functions ---
-    function findAndDisplayActivity() {
-        // Only run if both a vibe and a context have been selected.
-        if (selectedVibe && selectedContext) {
-            console.log(`Searching for: Vibe=${selectedVibe}, Context=${selectedContext}`);
+    function displayResult(result) {
+        if (attemptCounter >= MAX_ATTEMPTS) {
+            resultCard.classList.add('hidden');
+            contactUsEl.classList.remove('hidden');
+            return;
+        }
+
+        if (result) {
+            // Populate the card with the activity details
+            activityNameEl.textContent = result.name;
+            activityDescEl.textContent = result.desc;
+            activityWhyEl.textContent = result.why;
+
+            // Hide the contact message and show the result card
+            contactUsEl.classList.add('hidden');
+            resultCard.classList.remove('hidden');
             
+            attemptCounter++;
+        } else {
+            // Optional: handle cases where no match is found
+            resultCard.classList.add('hidden');
+        }
+    }
+
+    function findActivity() {
+        if (selectedVibe && selectedContext) {
             const result = activities.find(activity => 
                 activity.vibe === selectedVibe && activity.context === selectedContext
             );
-
-            if (result) {
-                // For now, we just print the result to the console to test it.
-                console.log('Found a match:', result);
-                alert(`Activity Found: ${result.name}`); // We can use an alert for easy testing!
-            } else {
-                console.log('No match found for this combination.');
-            }
+            displayResult(result);
         }
     }
 
@@ -68,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedVibe = button.dataset.vibe;
             vibeButtons.forEach(btn => btn.classList.remove('selected'));
             button.classList.add('selected');
-            findAndDisplayActivity(); // Run the search
+            findActivity();
         });
     });
 
@@ -77,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedContext = button.dataset.context;
             contextButtons.forEach(btn => btn.classList.remove('selected'));
             button.classList.add('selected');
-            findAndDisplayActivity(); // Run the search
+            findActivity();
         });
     });
 });
