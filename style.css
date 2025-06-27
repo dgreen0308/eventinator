@@ -59,3 +59,7 @@ h1 {
     color: white;
     border-color: #007bff;
 }
+/* This class hides elements until we need them */
+.hidden {
+    display: none;
+}
