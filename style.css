@@ -1,0 +1,12 @@
+/* Example Styles */
+#result-card {
+    border: 1px solid #eee;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    transition: transform 0.5s;
+}
+
+.hidden {
+    display: none;
+}
